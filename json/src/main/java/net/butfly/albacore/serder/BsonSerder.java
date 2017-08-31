@@ -20,7 +20,15 @@ import net.butfly.albacore.serder.support.ContentTypes;
 public class BsonSerder<E> extends ContentTypeSerderBase implements BinarySerder<E>, BeanSerder<E, byte[]> {
 	private static final long serialVersionUID = 6664350391207228363L;
 	public static final BsonSerder<Object> DEFAULT_OBJ = new BsonSerder0();
-	public static final BsonMapSerder DEFAULT_MAP = new BsonMapSerder();
+	private static final BsonMapSerder DEFAULT_MAP = new BsonMapSerder();
+
+	public static final byte[] map(Map<String, Object> map) {
+		return DEFAULT_MAP.ser(map);
+	}
+
+	public static final Map<String, Object> map(byte[] bson) {
+		return DEFAULT_MAP.der(bson);
+	}
 
 	public BsonSerder() {
 		this.contentType = ContentTypes.APPLICATION_BSON;

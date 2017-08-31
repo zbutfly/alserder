@@ -44,9 +44,9 @@ public class JacksonTest {
 
 		map = map();
 		System.out.println("Origin Map: " + map + ", title: " + ((Bean) map.get("object")).titles());
-		bson = BsonSerder.DEFAULT_MAP.ser(map);
+		bson = BsonSerder.map(map);
 		System.out.println("Map => BSON length: " + bson.length);
-		map = BsonSerder.DEFAULT_MAP.der(bson);
+		map = BsonSerder.map(bson);
 		System.out.println("BSON => Map sub title: " + ((Map) ((Map) map.get("object")).get("bean")).get("title"));
 		System.out.println();
 	}
