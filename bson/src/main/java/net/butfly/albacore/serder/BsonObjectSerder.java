@@ -24,6 +24,14 @@ public final class BsonObjectSerder extends ContentTypeSerderBase implements Ser
 	private final LinkedBlockingQueue<Pair<BSONEncoder, BasicBSONObject>> encoders;
 	private final LinkedBlockingQueue<Pair<BSONDecoder, BSONCallback>> decoders;
 
+	public static final byte[] bson(BSONObject map) {
+		return DEFAULT.ser(map);
+	}
+
+	public static final BSONObject bson(byte[] bson) {
+		return DEFAULT.der(bson, BSONObject.class);
+	}
+
 	public BsonObjectSerder() {
 		this(Integer.parseInt(Configs.gets("albacore.serder.bson.parallelism", "100")));
 	}
