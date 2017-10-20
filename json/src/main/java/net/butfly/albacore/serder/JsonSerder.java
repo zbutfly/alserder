@@ -21,7 +21,7 @@ import net.butfly.albacore.utils.logger.Logger;
 
 public class JsonSerder<E> extends ContentTypeSerderBase implements TextSerder<E>, BeanSerder<E, CharSequence> {
 	private static final long serialVersionUID = -4394900785541475884L;
-	private static final Logger logger = Logger.getLogger(JsonSerder.class);
+	static final Logger logger = Logger.getLogger(JsonSerder.class);
 	public static final JsonMapSerder JSON_MAPPER = new JsonMapSerder();
 
 	public static <T> JsonSerder<T> SERDER(Class<T> cl) {
