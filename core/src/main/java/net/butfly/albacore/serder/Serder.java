@@ -15,36 +15,12 @@ public interface Serder<PRESENT, DATA> extends Serializable {
 		throw new UnsupportedOperationException();
 	}
 
-	default Function<PRESENT, DATA> converter() {
+	default Function<PRESENT, DATA> conv() {
 		return this::ser;
 	}
 
-	default <T extends PRESENT> Function<DATA, T> unconverter(Class<T> present) {
+	default <T extends PRESENT> Function<DATA, T> unconv(Class<T> present) {
 		return d -> der(d, present);
-	}
-
-	default String mappingFieldName(String fieldName) {
-		return fieldName;
-	}
-
-	default String unmappingFieldName(Class<?> obj, String propName) {
-		return propName;
-	}
-
-	default <RESULT> Serder<PRESENT, RESULT> then(Serder<DATA, RESULT> next, Class<DATA> dataClass) {
-		return new Serder<PRESENT, RESULT>() {
-			private static final long serialVersionUID = -1235704170589079845L;
-
-			@Override
-			public RESULT ser(PRESENT from) {
-				return next.ser(Serder.this.ser(from));
-			}
-
-			@Override
-			public <T extends PRESENT> T der(RESULT from, Class<T> to) {
-				return Serder.this.der(next.der(from, dataClass), to);
-			}
-		};
 	}
 
 	default Serder<PRESENT, DATA> mapping(CaseFormat from, CaseFormat to) {
@@ -75,6 +51,30 @@ public interface Serder<PRESENT, DATA> extends Serializable {
 			@Override
 			public String unmappingFieldName(Class<?> data, String propName) {
 				return to.to(from, propName);
+			}
+		};
+	}
+
+	default String mappingFieldName(String fieldName) {
+		return fieldName;
+	}
+
+	default String unmappingFieldName(Class<?> obj, String propName) {
+		return propName;
+	}
+
+	default <RESULT> Serder<PRESENT, RESULT> then(Serder<DATA, RESULT> next, Class<DATA> dataClass) {
+		return new Serder<PRESENT, RESULT>() {
+			private static final long serialVersionUID = -1235704170589079845L;
+
+			@Override
+			public RESULT ser(PRESENT from) {
+				return next.ser(Serder.this.ser(from));
+			}
+
+			@Override
+			public <T extends PRESENT> T der(RESULT from, Class<T> to) {
+				return Serder.this.der(next.der(from, dataClass), to);
 			}
 		};
 	}

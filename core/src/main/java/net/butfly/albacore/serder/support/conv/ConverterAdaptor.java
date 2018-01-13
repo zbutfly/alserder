@@ -1,4 +1,4 @@
-package net.butfly.albacore.serder.support.converter;
+package net.butfly.albacore.serder.support.conv;
 
 import net.butfly.albacore.utils.Instances;
 

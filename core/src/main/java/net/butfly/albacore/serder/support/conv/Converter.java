@@ -1,4 +1,4 @@
-package net.butfly.albacore.serder.support.converter;
+package net.butfly.albacore.serder.support.conv;
 
 public interface Converter<SRC, DST> {
 	DST serialize(SRC original);

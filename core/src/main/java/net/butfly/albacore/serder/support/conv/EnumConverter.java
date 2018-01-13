@@ -1,4 +1,4 @@
-package net.butfly.albacore.serder.support.converter;
+package net.butfly.albacore.serder.support.conv;
 
 @SuppressWarnings("rawtypes")
 public class EnumConverter implements Converter<Enum, Integer> {
