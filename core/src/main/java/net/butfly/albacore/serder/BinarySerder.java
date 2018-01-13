@@ -1,13 +1,12 @@
-package net.butfly.albacore.serder.support;
+package net.butfly.albacore.serder;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.butfly.albacore.serder.Serder;
 import net.butfly.albacore.utils.IOs;
 
-public interface BinarySerder<PRESENT> extends Serder<PRESENT, byte[]>, ContentTypeSerder {
+public interface BinarySerder<PRESENT> extends Serder<PRESENT, byte[]>, ContentSerder {
 	default void ser(PRESENT from, OutputStream to) throws IOException {
 		to.write(ser(from));
 	}

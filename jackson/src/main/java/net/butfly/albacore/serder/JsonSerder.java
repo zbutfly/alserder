@@ -13,13 +13,10 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import net.butfly.albacore.exception.SystemException;
 import net.butfly.albacore.serder.json.Jsons;
-import net.butfly.albacore.serder.support.BeanSerder;
-import net.butfly.albacore.serder.support.ClassInfoSerder;
-import net.butfly.albacore.serder.support.ContentTypeSerderBase;
-import net.butfly.albacore.serder.support.TextSerder;
+import net.butfly.albacore.serder.support.ContentSerderBase;
 import net.butfly.albacore.utils.logger.Logger;
 
-public class JsonSerder<E> extends ContentTypeSerderBase implements TextSerder<E>, BeanSerder<E, CharSequence> {
+public class JsonSerder<E> extends ContentSerderBase implements TextSerder<E>, BeanSerder<E, CharSequence> {
 	private static final long serialVersionUID = -4394900785541475884L;
 	static final Logger logger = Logger.getLogger(JsonSerder.class);
 	public static final JsonMapSerder JSON_MAPPER = new JsonMapSerder();

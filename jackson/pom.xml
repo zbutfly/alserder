@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>net.butfly.albacore</groupId>
 		<artifactId>albacore-serder</artifactId>
-		<version>1.0.2-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>albacore-serder-jackson</artifactId>
 	<properties>
@@ -14,7 +14,7 @@
 		<dependency>
 			<groupId>net.butfly.albacore</groupId>
 			<artifactId>albacore-serder-core</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		<!-- jackson dependencies -->
 		<dependency>

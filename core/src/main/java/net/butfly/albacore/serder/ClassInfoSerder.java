@@ -1,6 +1,4 @@
-package net.butfly.albacore.serder.support;
-
-import net.butfly.albacore.serder.Serder;
+package net.butfly.albacore.serder;
 
 public interface ClassInfoSerder<P, D> extends Serder<P, D> {
 	<TT extends P> TT der(D from);

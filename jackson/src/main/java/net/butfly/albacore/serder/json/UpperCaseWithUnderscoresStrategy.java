@@ -1,6 +1,7 @@
 package net.butfly.albacore.serder.json;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy.PropertyNamingStrategyBase;
+
 import net.butfly.albacore.utils.CaseFormat;
 
 public class UpperCaseWithUnderscoresStrategy extends PropertyNamingStrategyBase {

@@ -12,14 +12,11 @@ import com.caucho.hessian.io.AbstractSerializerFactory;
 import com.caucho.hessian.io.SerializerFactory;
 
 import net.butfly.albacore.exception.SystemException;
-import net.butfly.albacore.serder.support.BinarySerder;
-import net.butfly.albacore.serder.support.ClassInfoSerder;
-import net.butfly.albacore.serder.support.ContentTypeSerderBase;
-import net.butfly.albacore.serder.support.ContentTypes;
+import net.butfly.albacore.serder.support.ContentSerderBase;
 import net.butfly.albacore.serder.support.SerderFactorySupport;
 import net.butfly.albacore.utils.Reflections;
 
-public final class BurlapSerder extends ContentTypeSerderBase implements BinarySerder<Object>, SerderFactorySupport,
+public final class BurlapSerder extends ContentSerderBase implements BinarySerder<Object>, SerderFactorySupport,
 		ClassInfoSerder<Object, byte[]> {
 	private static final long serialVersionUID = 691937271877170782L;
 

@@ -3,8 +3,6 @@ package net.butfly.albacore.serder.converter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import net.butfly.albacore.utils.Enums;
-
 import com.caucho.hessian.io.AbstractDeserializer;
 import com.caucho.hessian.io.AbstractHessianInput;
 import com.caucho.hessian.io.AbstractHessianOutput;
@@ -12,6 +10,8 @@ import com.caucho.hessian.io.AbstractSerializerFactory;
 import com.caucho.hessian.io.Deserializer;
 import com.caucho.hessian.io.HessianProtocolException;
 import com.caucho.hessian.io.Serializer;
+
+import net.butfly.albacore.utils.Enums;
 
 @Deprecated
 @SuppressWarnings({ "rawtypes", "unchecked" })

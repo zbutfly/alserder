@@ -9,9 +9,7 @@ import org.apache.http.entity.ContentType;
 
 import com.google.common.base.Charsets;
 
-import net.butfly.albacore.serder.support.ClassInfoSerder;
-import net.butfly.albacore.serder.support.ContentTypeSerder;
-import net.butfly.albacore.serder.support.ContentTypes;
+import net.butfly.albacore.serder.ContentSerder.ContentTypes;
 import net.butfly.albacore.utils.CaseFormat;
 import net.butfly.albacore.utils.Instances;
 import net.butfly.albacore.utils.Pair;
@@ -43,13 +41,13 @@ public final class Serders extends Utils {
 		return JavaSerder.class;
 	}
 
-	private static final Map<String, ContentTypeSerder> SERDERS = new ConcurrentHashMap<>();
+	private static final Map<String, ContentSerder> SERDERS = new ConcurrentHashMap<>();
 
-	public static ContentTypeSerder construct(ContentType contentType) {
+	public static ContentSerder construct(ContentType contentType) {
 		return SERDERS.computeIfAbsent(contentType.getMimeType() + "," + contentType.getCharset().toString(), ct -> {
-			for (Class<? extends ContentTypeSerder> c : Reflections.getSubClasses(ContentTypeSerder.class)) {
+			for (Class<? extends ContentSerder> c : Reflections.getSubClasses(ContentSerder.class)) {
 				if (Modifier.isAbstract(c.getModifiers()) || Modifier.isStatic(c.getModifiers())) continue;
-				ContentTypeSerder s = Reflections.construct(c);
+				ContentSerder s = Reflections.construct(c);
 				if (ContentTypes.mimeMatch(s.contentType().getMimeType(), contentType.getMimeType())) {
 					s.charset(contentType.getCharset());
 					return s;
