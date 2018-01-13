@@ -6,18 +6,16 @@
 		<artifactId>albacore-serder</artifactId>
 		<version>1.0.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>albacore-serder-json</artifactId>
+	<artifactId>albacore-serder-jackson</artifactId>
+	<properties>
+		<version.jackson>2.9.3</version.jackson>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>net.butfly.albacore</groupId>
 			<artifactId>albacore-serder-core</artifactId>
 			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>net.butfly.albacore</groupId> -->
-		<!-- <artifactId>albacore-scala</artifactId> -->
-		<!-- <version>3.0.0-SNAPSHOT</version> -->
-		<!-- </dependency> -->
 		<!-- jackson dependencies -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -41,17 +39,17 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-scala${version.scala.suffix}</artifactId>
-			<version>${version.jackson}</version>
+			<version>2.9.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.json4s</groupId>
 			<artifactId>json4s-jackson${version.scala.suffix}</artifactId>
-			<version>3.5.1</version>
+			<version>3.6.0-M2</version>
 		</dependency>
 		<dependency>
 			<groupId>de.undercouch</groupId>
 			<artifactId>bson4jackson</artifactId>
-			<version>2.7.0</version>
+			<version>2.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>

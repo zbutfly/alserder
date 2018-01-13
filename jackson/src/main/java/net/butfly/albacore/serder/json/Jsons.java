@@ -59,6 +59,7 @@ public final class Jsons extends Utils {
 	}
 
 	private static ObjectMapper standard(ObjectMapper mapper) {
+		@SuppressWarnings("deprecation")
 		ObjectMapper m = mapper.enable(Feature.ALLOW_SINGLE_QUOTES)//
 				.enable(Feature.IGNORE_UNDEFINED)//
 				.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)//

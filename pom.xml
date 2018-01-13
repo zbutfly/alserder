@@ -12,10 +12,8 @@
 	<modules>
 		<module>core</module>
 		<module>hessian</module>
-		<module>json</module>
-		<module>bson</module>
+		<module>jackson</module>
 		<module>kryo</module>
-		<module>hbase</module>
 		<!-- <module>avro</module> -->
 		<!--<module>protobuf</module> -->
 	</modules>
