@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.OutputStream;
+import java.io.ObjectOutputStream;
 
 import net.butfly.albacore.utils.Reflections;
 
@@ -24,26 +24,12 @@ public class JavaSerder implements BinarySerder<Object>, ClassInfoSerder<Object,
 
 	@Override
 	public byte[] ser(Object from) {
-		try (ByteArrayOutputStream os = new ByteArrayOutputStream();) {
-			ser(from, os);
-			return os.toByteArray();
-		} catch (IOException e) {
-			return null;
-		}
+		return toBytes(from);
 	}
 
 	@Override
 	public <T> T der(byte[] from) {
-		try (InputStream in = new ByteArrayInputStream(from);) {
-			return der(in);
-		} catch (IOException e) {
-			return null;
-		}
-	}
-
-	@Override
-	public void ser(Object from, OutputStream to) throws IOException {
-		to.write(ser(from));
+		return fromBytes(from);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -57,14 +43,29 @@ public class JavaSerder implements BinarySerder<Object>, ClassInfoSerder<Object,
 
 	@Override
 	public <T> T der(byte[] from, Class<T> to) {
-		// TODO Auto-generated method stub
-		return null;
+		return der(from);
 	}
 
 	@Override
 	public <T> T der(InputStream from, Class<T> to) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return der(from);
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T fromBytes(byte[] b) {
+		try (InputStream in = new ByteArrayInputStream(b); ObjectInputStream s = new ObjectInputStream(in);) {
+			return (T) s.readObject();
+		} catch (IOException | ClassNotFoundException e) {
+			return null;
+		}
+	}
+
+	public static <T> byte[] toBytes(T o) {
+		try (ByteArrayOutputStream os = new ByteArrayOutputStream(); ObjectOutputStream s = new ObjectOutputStream(os);) {
+			s.writeObject(o);
+			return os.toByteArray();
+		} catch (IOException e) {
+			return null;
+		}
+	}
 }

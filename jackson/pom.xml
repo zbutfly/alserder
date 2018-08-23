@@ -36,6 +36,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-scala_${version.scala.main}</artifactId>
+			<version>${version.jackson}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.json4s</groupId>
