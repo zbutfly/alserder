@@ -3,7 +3,9 @@ package net.butfly.albacore.serder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -24,6 +26,13 @@ public class BsonSerder<E> extends ContentSerderBase implements BinarySerder<E>,
 
 	public static final Map<String, Object> map(byte[] bson) {
 		return DEFAULT_MAP.der(bson);
+	}
+
+	public static final List<Map<String, Object>> maps(byte[] bson) {
+		Map<String, Object> map = DEFAULT_MAP.der(bson);
+		List<Map<String, Object>> list = new ArrayList<>();
+		list.add(map);
+		return list;
 	}
 
 	public BsonSerder() {
@@ -64,7 +73,8 @@ public class BsonSerder<E> extends ContentSerderBase implements BinarySerder<E>,
 
 	@Override
 	public <T extends E> T der(byte[] from, Class<T> to) {
-		if (null == from) return null;
+		if (null == from)
+			return null;
 		try (ByteArrayInputStream bais = new ByteArrayInputStream(from);) {
 			return Jsons.bsoner.readValue(bais, to);
 		} catch (IOException e) {
@@ -73,10 +83,11 @@ public class BsonSerder<E> extends ContentSerderBase implements BinarySerder<E>,
 	}
 
 	@SuppressWarnings("unchecked")
-	public static final class BsonMapSerder extends BsonSerder<Map<String, Object>> implements
-			ClassInfoSerder<Map<String, Object>, byte[]> {
+	public static final class BsonMapSerder extends BsonSerder<Map<String, Object>>
+			implements ClassInfoSerder<Map<String, Object>, byte[]> {
 		private static final long serialVersionUID = 6664350391207228363L;
-		private static final JavaType t = TypeFactory.defaultInstance().constructMapType(HashMap.class, String.class, Object.class);
+		private static final JavaType t = TypeFactory.defaultInstance().constructMapType(HashMap.class, String.class,
+				Object.class);
 
 		@Override
 		public Map<String, Object>[] der(byte[] from, Class<?>... tos) {
@@ -90,7 +101,8 @@ public class BsonSerder<E> extends ContentSerderBase implements BinarySerder<E>,
 
 		@Override
 		public <T extends Map<String, Object>> T der(byte[] from) {
-			if (null == from) return null;
+			if (null == from)
+				return null;
 			try (ByteArrayInputStream bais = new ByteArrayInputStream(from);) {
 				return Jsons.bsoner.readValue(bais, t);
 			} catch (IOException e) {
