@@ -33,16 +33,16 @@
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-scala_${version.scala.main}</artifactId>
-			<version>${version.jackson}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.json4s</groupId>
-			<artifactId>json4s-jackson_${version.scala.main}</artifactId>
-			<version>3.6.0</version>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>com.fasterxml.jackson.module</groupId> -->
+		<!-- <artifactId>jackson-module-scala_${version.scala.main}</artifactId> -->
+		<!-- <version>${version.jackson}</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.json4s</groupId> -->
+		<!-- <artifactId>json4s-jackson_${version.scala.main}</artifactId> -->
+		<!-- <version>3.6.0</version> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>de.undercouch</groupId>
 			<artifactId>bson4jackson</artifactId>

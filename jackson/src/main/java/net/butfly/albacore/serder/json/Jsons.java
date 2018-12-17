@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import de.undercouch.bson4jackson.BsonFactory;
 import de.undercouch.bson4jackson.BsonParser;
 import net.butfly.albacore.serder.JsonSerder;
+import net.butfly.albacore.utils.Pair;
 import net.butfly.albacore.utils.Utils;
-import scala.Tuple2;
 
 public final class Jsons extends Utils {
 	private static final JsonFactory DEFAULT_BSON_FACTORY = new BsonFactory()//
@@ -104,11 +104,11 @@ public final class Jsons extends Utils {
 	}
 
 	@SafeVarargs
-	public static String simpleJSON(String key, Object value, Tuple2<String, Object>... kvs) {
+	public static String simpleJSON(String key, Object value, Pair<String, Object>... kvs) {
 		Map<String, Object> map = new HashMap<>();
 		map.put(key, value);
-		for (Tuple2<String, ?> e : kvs)
-			map.put(e._1, e._2);
+		for (Pair<String, ?> e : kvs)
+			map.put(e.v1(), e.v2());
 		return JsonSerder.JSON_MAPPER.ser(map).toString();
 	}
 
