@@ -8,10 +8,8 @@ import java.util.Map;
 
 import org.apache.http.entity.ContentType;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
@@ -79,7 +77,8 @@ public class JsonSerder<E> extends ContentSerderBase implements TextSerder<E>, B
 			ClassInfoSerder<Map<String, Object>, CharSequence> {
 		private static final long serialVersionUID = 6664350391207228363L;
 		private static final JavaType t = TypeFactory.defaultInstance().constructMapType(HashMap.class, String.class, Object.class);
-		private static final JavaType ts = TypeFactory.defaultInstance().constructParametricType(List.class, TypeFactory.defaultInstance().constructMapType(HashMap.class, String.class, Object.class));
+		private static final JavaType ts = TypeFactory.defaultInstance().constructParametricType(List.class, TypeFactory.defaultInstance()
+				.constructMapType(HashMap.class, String.class, Object.class));
 
 		@Override
 		public final Map<String, Object>[] der(CharSequence from, Class<?>... tos) {
@@ -109,17 +108,24 @@ public class JsonSerder<E> extends ContentSerderBase implements TextSerder<E>, B
 			} catch (IOException e) {
 				try {
 					r = Jsons.mapper.readValue(from.toString(), ts);
-				} catch (IOException e1) {return null;}
+				} catch (IOException e1) {
+					return null;
+				}
 			}
 			if (r instanceof HashMap) {
 				List<Map<String, Object>> list = new ArrayList<>();
 				list.add((T) r);
 				return (List<T>) list;
-			}
-			else if (r instanceof List) {
-				return (List<T>) r;
-			}
+			} else if (r instanceof List) { return (List<T>) r; }
 			throw new RuntimeException("Not support this type:" + r.getClass().getName());
+		}
+
+		public String sers(Map<String, Object>[] v) {
+			try {
+				return Jsons.mapper.writeValueAsString(v);
+			} catch (JsonProcessingException e) {
+				return null;
+			}
 		}
 
 		@Override
