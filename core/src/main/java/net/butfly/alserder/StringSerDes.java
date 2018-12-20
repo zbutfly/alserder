@@ -1,9 +1,9 @@
 package net.butfly.alserder;
 
-import net.butfly.alserder.SD.SDon;
+import net.butfly.alserder.SerDes.SerDesAs;
 
-@SDon(format = "str", from = String.class, to = byte[].class)
-public class StrSD implements SD<String, byte[]> {
+@SerDesAs(format = "str", from = String.class, to = byte[].class)
+public class StringSerDes implements SerDes<String, byte[]> {
 	private static final long serialVersionUID = 6541727872025508373L;
 
 	@Override
