@@ -6,9 +6,9 @@ import java.util.Map;
 import net.butfly.albacore.serder.BsonSerder;
 import net.butfly.albacore.utils.collection.Colls;
 import net.butfly.alserder.SerDes;
-import net.butfly.alserder.SerDes.SerDesAs;
+import net.butfly.alserder.SerDes.SerAs;
 
-@SerDesAs(format = "bson", from = Map.class, to = byte[].class)
+@SerAs(format = "bson", from = Map.class, to = byte[].class)
 public class BsonSerDes implements SerDes<Map<String, Object>, byte[]> {
 	private static final long serialVersionUID = -4183221055041421951L;
 
@@ -18,7 +18,7 @@ public class BsonSerDes implements SerDes<Map<String, Object>, byte[]> {
 	}
 
 	@Override
-	public Map<String, Object> der(byte[] bytes) {
+	public Map<String, Object> deser(byte[] bytes) {
 		return null == bytes ? null : BsonSerder.map(bytes);
 	}
 
@@ -30,7 +30,7 @@ public class BsonSerDes implements SerDes<Map<String, Object>, byte[]> {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public List<Map<String, Object>> ders(byte[] v) {
+	public List<Map<String, Object>> desers(byte[] v) {
 		Object vvv = BsonSerder.DEFAULT_OBJ.der(v);
 		List<Map<String, Object>> l = Colls.list();
 		if (null == vvv) return null;

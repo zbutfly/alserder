@@ -9,9 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import net.butfly.albacore.serder.JsonSerder;
 import net.butfly.albacore.serder.json.Jsons;
 import net.butfly.alserder.SerDes;
-import net.butfly.alserder.SerDes.SerDesAs;
+import net.butfly.alserder.SerDes.SerAs;
 
-@SerDesAs(format = "json", from = Map.class, to = String.class)
+@SerAs(format = "json", from = Map.class, to = String.class)
 public class JsonSerDes implements SerDes<Map<String, Object>, String> {
 	private static final long serialVersionUID = 6767740047890492594L;
 
@@ -21,7 +21,7 @@ public class JsonSerDes implements SerDes<Map<String, Object>, String> {
 	}
 
 	@Override
-	public Map<String, Object> der(String s) {
+	public Map<String, Object> deser(String s) {
 		return null == s ? null : JsonSerder.JSON_MAPPER.der(s);
 	}
 
@@ -36,7 +36,7 @@ public class JsonSerDes implements SerDes<Map<String, Object>, String> {
 	}
 
 	@Override
-	public List<Map<String, Object>> ders(String s) {
+	public List<Map<String, Object>> desers(String s) {
 		try {
 			return Jsons.mapper.readValue(s, Jsons.mapper.getTypeFactory().constructCollectionType(List.class, String.class));
 		} catch (IOException e) {

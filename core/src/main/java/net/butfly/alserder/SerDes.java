@@ -1,7 +1,6 @@
 
 package net.butfly.alserder;
 
-import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -22,22 +21,66 @@ import net.butfly.albacore.utils.collection.Maps;
  * @param <FROM>
  * @param <TO>
  */
-public interface SerDes<FROM, TO> extends Serializable {
+public interface SerDes<FROM, TO> extends SerDesForm<FROM, TO> {
 	TO ser(FROM v);
 
-	FROM der(TO r);
+	FROM deser(TO r);
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <F, T, D extends SerDes<F, T>> D sd(String format) {
+		boolean revert = format.startsWith("rev:");
+		SerDes r = ALL_SDERS.computeIfAbsent(revert ? format.substring(4) : format, f -> {
+			Set<Class<? extends SerDes>> impls = Reflections.getSubClasses(SerDes.class);
+			for (Class<? extends SerDes> c : impls) {
+				SerAs sd = c.getAnnotation(SerAs.class);
+				if (null != sd && f.equals(sd.format())) try {
+					return c.getConstructor().newInstance();
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+						| NoSuchMethodException | SecurityException e) {
+							continue;
+						}
+			}
+			return null;
+		});
+		return (D) (null == r || !revert ? r : r.revert());
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <F, T, D extends SerDes<F, T>> D sd(String... format) {
+		if (null == format || format.length == 0) return null;
+		List<String> formats = Colls.list(format);
+		SerDes sd = sd(formats.remove(0));
+		for (String f : formats)
+			sd = sd.then(f);
+		return (D) sd;
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	@interface SerAs { // default value for bson
+		String format();
+
+		Class<?> from() default Map.class;
+
+		Class<?> to() default byte[].class;
+	}
 
 	@SuppressWarnings("unchecked")
-	default TO sers(FROM... v) {
-		return sers(Colls.list(v));
+	default Class<FROM> fromClass() {
+		return (Class<FROM>) _Private.sdAnn(this.getClass()).from();
 	}
 
-	default TO sers(List<FROM> vs) {
-		throw new UnsupportedOperationException();
+	@SuppressWarnings("unchecked")
+	default Class<TO> toClass() {
+		return (Class<TO>) _Private.sdAnn(this.getClass()).to();
 	}
 
-	default List<FROM> ders(TO r) {
-		return Colls.list(der(r));
+	default String format() {
+		return _Private.sdAnn(this.getClass()).format();
+	}
+
+	default List<FROM> desers(TO r) {
+		return Colls.list(deser(r));
 	}
 
 	default SerDes<TO, FROM> revert() {
@@ -46,11 +89,11 @@ public interface SerDes<FROM, TO> extends Serializable {
 
 			@Override
 			public FROM ser(TO v) {
-				return SerDes.this.der(v);
+				return SerDes.this.deser(v);
 			}
 
 			@Override
-			public TO der(FROM r) {
+			public TO deser(FROM r) {
 				return SerDes.this.ser(r);
 			}
 
@@ -71,44 +114,11 @@ public interface SerDes<FROM, TO> extends Serializable {
 		};
 	}
 
-	// lookup
-	static final String DEFAULT_SD_FORMAT = Configs.gets("alserder.default.format", "str");
-	@SuppressWarnings("rawtypes")
-	static final Map<String, SerDes> ALL_SDERS = Maps.of();
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	static <F, T> SerDes<F, T> sd(String format) {
-		boolean revert = format.startsWith("rev:");
-		SerDes r = ALL_SDERS.computeIfAbsent(revert ? format.substring(4) : format, f -> {
-			Set<Class<? extends SerDes>> impls = Reflections.getSubClasses(SerDes.class);
-			for (Class<? extends SerDes> c : impls) {
-				SerDesAs sd = c.getAnnotation(SerDesAs.class);
-				if (null != sd && f.equals(sd.format())) try {
-					return c.getConstructor().newInstance();
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-						| NoSuchMethodException | SecurityException e) {
-							continue;
-						}
-			}
-			return null;
-		});
-		return null == r || !revert ? r : r.revert();
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target(ElementType.TYPE)
-	@interface SerDesAs { // default value for bson
-		String format();
-
-		Class<?> from() default Map.class;
-
-		Class<?> to() default byte[].class;
-	}
-
 	// then
-	default <THEN> SerDes<FROM, THEN> then(SerDes<TO, THEN> then) {
+	default <THEN> SerDes<FROM, THEN> then(String format) {
 		return new SerDes<FROM, THEN>() {
 			private static final long serialVersionUID = -1388017778891200080L;
+			private SerDes<TO, THEN> then = SerDes.sd(format);
 
 			@Override
 			public THEN ser(FROM o) {
@@ -116,8 +126,8 @@ public interface SerDes<FROM, TO> extends Serializable {
 			}
 
 			@Override
-			public FROM der(THEN r) {
-				return SerDes.this.der(then.der(r));
+			public FROM deser(THEN r) {
+				return SerDes.this.deser(then.deser(r));
 			}
 
 			@SuppressWarnings("unchecked")
@@ -132,36 +142,27 @@ public interface SerDes<FROM, TO> extends Serializable {
 			}
 
 			@Override
-			public List<FROM> ders(THEN r) {
+			public List<FROM> desers(THEN r) {
 				List<FROM> f = Colls.list();
-				then.ders(r).forEach(t -> f.add(SerDes.this.der(t)));
+				then.desers(r).forEach(t -> f.add(SerDes.this.deser(t)));
 				return f;
 			}
 		};
 	}
 
+	// lookup
+	static final String DEFAULT_SD_FORMAT = Configs.gets("alserder.default.format", "str");
+	@SuppressWarnings("rawtypes")
+	static final Map<String, SerDes> ALL_SDERS = Maps.of();
+
 	// other utils
 	class _Private {
 		@SuppressWarnings("rawtypes")
-		private static SerDesAs sdAnn(Class<? extends SerDes> cls) {
+		private static SerAs sdAnn(Class<? extends SerDes> cls) {
 			Class<?> c = cls;
-			SerDesAs ann = null;
-			while (null == (ann = c.getAnnotation(SerDesAs.class)) && (null != (c = c.getSuperclass())));
+			SerAs ann = null;
+			while (null == (ann = c.getAnnotation(SerAs.class)) && (null != (c = c.getSuperclass())));
 			return ann;
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	default Class<FROM> fromClass() {
-		return (Class<FROM>) _Private.sdAnn(this.getClass()).from();
-	}
-
-	@SuppressWarnings("unchecked")
-	default Class<TO> toClass() {
-		return (Class<TO>) _Private.sdAnn(this.getClass()).to();
-	}
-
-	default String format() {
-		return _Private.sdAnn(this.getClass()).format();
 	}
 }

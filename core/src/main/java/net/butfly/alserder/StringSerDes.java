@@ -1,8 +1,8 @@
 package net.butfly.alserder;
 
-import net.butfly.alserder.SerDes.SerDesAs;
+import net.butfly.alserder.SerDes.SerAs;
 
-@SerDesAs(format = "str", from = String.class, to = byte[].class)
+@SerAs(format = "str", from = String.class, to = byte[].class)
 public class StringSerDes implements SerDes<String, byte[]> {
 	private static final long serialVersionUID = 6541727872025508373L;
 
@@ -12,7 +12,7 @@ public class StringSerDes implements SerDes<String, byte[]> {
 	}
 
 	@Override
-	public String der(byte[] v) {
+	public String deser(byte[] v) {
 		return null == v ? null : new String(v);
 	}
 }
