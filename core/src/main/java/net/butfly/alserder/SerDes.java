@@ -1,6 +1,7 @@
 
 package net.butfly.alserder;
 
+import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -21,7 +22,7 @@ import net.butfly.albacore.utils.collection.Maps;
  * @param <FROM>
  * @param <TO>
  */
-public interface SerDes<FROM, TO> extends SerDesForm<FROM, TO> {
+public interface SerDes<FROM, TO> extends Serializable {
 	TO ser(FROM v);
 
 	FROM deser(TO r);
@@ -63,6 +64,8 @@ public interface SerDes<FROM, TO> extends SerDesForm<FROM, TO> {
 		Class<?> from() default Map.class;
 
 		Class<?> to() default byte[].class;
+
+		// boolean byField() default true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -79,9 +82,9 @@ public interface SerDes<FROM, TO> extends SerDesForm<FROM, TO> {
 		return _Private.sdAnn(this.getClass()).format();
 	}
 
-	default List<FROM> desers(TO r) {
-		return Colls.list(deser(r));
-	}
+	// default boolean byField() {
+	// return _Private.sdAnn(this.getClass()).byField();
+	// }
 
 	default SerDes<TO, FROM> revert() {
 		return new SerDes<TO, FROM>() {
@@ -128,24 +131,6 @@ public interface SerDes<FROM, TO> extends SerDesForm<FROM, TO> {
 			@Override
 			public FROM deser(THEN r) {
 				return SerDes.this.deser(then.deser(r));
-			}
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public THEN sers(FROM... vs) {
-				return then.ser(SerDes.this.sers(vs));
-			}
-
-			@Override
-			public THEN sers(List<FROM> vs) {
-				return then.ser(SerDes.this.sers(vs));
-			}
-
-			@Override
-			public List<FROM> desers(THEN r) {
-				List<FROM> f = Colls.list();
-				then.desers(r).forEach(t -> f.add(SerDes.this.deser(t)));
-				return f;
 			}
 		};
 	}
