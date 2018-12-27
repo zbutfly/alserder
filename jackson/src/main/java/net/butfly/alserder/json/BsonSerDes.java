@@ -3,11 +3,11 @@ package net.butfly.alserder.json;
 import java.util.Map;
 
 import net.butfly.albacore.serder.BsonSerder;
-import net.butfly.alserder.SerDes;
+import net.butfly.alserder.SerDes.MapSerDes;
 import net.butfly.alserder.SerDes.SerAs;
 
 @SerAs(format = "bson", from = Map.class, to = byte[].class)
-public class BsonSerDes implements SerDes<Map<String, Object>, byte[]> {
+public class BsonSerDes implements MapSerDes<byte[]> {
 	private static final long serialVersionUID = -4183221055041421951L;
 
 	@Override

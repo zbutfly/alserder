@@ -5,11 +5,11 @@ import java.util.Map;
 
 import net.butfly.albacore.serder.BsonSerder;
 import net.butfly.albacore.utils.collection.Colls;
-import net.butfly.alserder.SerDes;
+import net.butfly.alserder.SerDes.MapListSerDes;
 import net.butfly.alserder.SerDes.SerAs;
 
 @SerAs(format = "bsons", from = List.class, to = byte[].class)
-public class BsonsSerDes implements SerDes<List<Map<String, Object>>, byte[]> {
+public class BsonsSerDes implements MapListSerDes<byte[]> {
 	private static final long serialVersionUID = -4183221055041421951L;
 
 	@Override

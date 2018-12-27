@@ -8,10 +8,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import net.butfly.albacore.serder.json.Jsons;
 import net.butfly.alserder.SerDes;
+import net.butfly.alserder.SerDes.MapListSerDes;
 import net.butfly.alserder.SerDes.SerAs;
 
 @SerAs(format = "jsons", from = List.class, to = String.class)
-public class JsonsSerDes implements SerDes<List<Map<String, Object>>, String> {
+public class JsonsSerDes implements MapListSerDes<String> {
 	private static final long serialVersionUID = 6767740047890492594L;
 
 	@Override

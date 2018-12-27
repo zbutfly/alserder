@@ -15,14 +15,9 @@ import net.butfly.albacore.utils.Configs;
 import net.butfly.albacore.utils.Reflections;
 import net.butfly.albacore.utils.collection.Colls;
 import net.butfly.albacore.utils.collection.Maps;
+import net.butfly.albacore.utils.logger.Loggable;
 
-/**
- * Serializer and Deserializer
- * 
- * @param <FROM>
- * @param <TO>
- */
-public interface SerDes<FROM, TO> extends Serializable {
+public interface SerDes<FROM, TO> extends Serializable, Loggable {
 	TO ser(FROM v);
 
 	FROM deser(TO r);
@@ -56,12 +51,15 @@ public interface SerDes<FROM, TO> extends Serializable {
 		return (D) sd;
 	}
 
+	// info
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	@interface SerAs { // default value for bson
 		String format();
 
-		Class<?> from() default Map.class;
+		Class<?> from()
+
+		default Map.class;
 
 		Class<?> to() default byte[].class;
 
@@ -70,21 +68,49 @@ public interface SerDes<FROM, TO> extends Serializable {
 
 	@SuppressWarnings("unchecked")
 	default Class<FROM> fromClass() {
-		return (Class<FROM>) _Private.sdAnn(this.getClass()).from();
+		SerAs a = _Private.sdAnn(this.getClass());
+		return null == a ? null : (Class<FROM>) a.from();
 	}
 
 	@SuppressWarnings("unchecked")
 	default Class<TO> toClass() {
-		return (Class<TO>) _Private.sdAnn(this.getClass()).to();
+		SerAs a = _Private.sdAnn(this.getClass());
+		return null == a ? null : (Class<TO>) a.to();
 	}
 
 	default String format() {
-		return _Private.sdAnn(this.getClass()).format();
+		SerAs a = _Private.sdAnn(this.getClass());
+		return null == a ? null : a.format();
 	}
 
-	// default boolean byField() {
-	// return _Private.sdAnn(this.getClass()).byField();
-	// }
+	/**
+	 * on input, deser(), toClass is source class.<br>
+	 * on output, ser(), fromClass is source class.<br>
+	 * so the func return the <code>source class of serder is rmap</code>, means process whole record.<br>
+	 * if not, processing fields each by each.<br>
+	 */
+	default boolean isMapOp(boolean input) {
+		Class<?> c = input ? toClass() : fromClass();
+		return null == c ? false : Map.class.isAssignableFrom(c);
+	}
+
+	// trans
+	default <THEN> SerDes<FROM, THEN> then(String format) {
+		return new SerDes<FROM, THEN>() {
+			private static final long serialVersionUID = -1388017778891200080L;
+			private SerDes<TO, THEN> then = SerDes.sd(format);
+
+			@Override
+			public THEN ser(FROM o) {
+				return then.ser(SerDes.this.ser(o));
+			}
+
+			@Override
+			public FROM deser(THEN r) {
+				return SerDes.this.deser(then.deser(r));
+			}
+		};
+	}
 
 	default SerDes<TO, FROM> revert() {
 		return new SerDes<TO, FROM>() {
@@ -117,24 +143,6 @@ public interface SerDes<FROM, TO> extends Serializable {
 		};
 	}
 
-	// then
-	default <THEN> SerDes<FROM, THEN> then(String format) {
-		return new SerDes<FROM, THEN>() {
-			private static final long serialVersionUID = -1388017778891200080L;
-			private SerDes<TO, THEN> then = SerDes.sd(format);
-
-			@Override
-			public THEN ser(FROM o) {
-				return then.ser(SerDes.this.ser(o));
-			}
-
-			@Override
-			public FROM deser(THEN r) {
-				return SerDes.this.deser(then.deser(r));
-			}
-		};
-	}
-
 	// lookup
 	static final String DEFAULT_SD_FORMAT = Configs.gets("alserder.default.format", "str");
 	@SuppressWarnings("rawtypes")
@@ -150,4 +158,11 @@ public interface SerDes<FROM, TO> extends Serializable {
 			return ann;
 		}
 	}
+
+	// other
+	interface MapSerDes<TO> extends SerDes<Map<String, Object>, TO> {}
+
+	interface ListSerDes<FROM, TO> extends SerDes<List<FROM>, TO> {}
+
+	interface MapListSerDes<TO> extends ListSerDes<Map<String, Object>, TO> {}
 }
