@@ -1,6 +1,6 @@
 package net.butfly.alserder;
 
-@SerAs(format = "str", from = String.class, to = byte[].class)
+@SerDes.As("str")
 public class StringSerDes implements SerDes<String, byte[]> {
 	private static final long serialVersionUID = 6541727872025508373L;
 

@@ -1,17 +1,39 @@
 package net.butfly.alserder;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import net.butfly.albacore.utils.Reflections;
+import net.butfly.albacore.utils.Generics;
 import net.butfly.albacore.utils.collection.Colls;
 import net.butfly.albacore.utils.logger.Loggable;
-import net.butfly.alserder.SerAs._Private;
 
 public interface SerDes<FROM, TO> extends Serializable, Loggable {
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	public @interface AsList {
+		As[] value();
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	@Repeatable(AsList.class)
+	public @interface As {
+		String value();
+
+		boolean list() default false;
+	}
+
+	@SuppressWarnings("deprecation")
+	default Class<?> rawClass() {
+		return Generics.getGenericParamClass(getClass(), SerDes.class, "TO");
+	}
+
 	default TO ser(FROM v) {
 		throw new UnsupportedOperationException();
 	}
@@ -20,11 +42,22 @@ public interface SerDes<FROM, TO> extends Serializable, Loggable {
 		throw new UnsupportedOperationException();
 	};
 
+	default TO sers(List<FROM> l) {
+		if (null == l || l.isEmpty()) return null;
+		if (l.size() > 1) //
+			logger().warn(getClass() + " does not support multiple serializing, only first will be writen: \n\t" + l.toString());
+		FROM first = l.get(0);
+		return null == first ? null : ser(first);
+	}
+
+	default List<FROM> desers(TO r) {
+		return null == r ? Colls.list() : Colls.list(deser(r));
+	}
+
 	// trans
-	default <THEN> SerDes<FROM, THEN> then(String format) {
+	default <THEN> SerDes<FROM, THEN> then(SerDes<TO, THEN> then) {
 		return new SerDes<FROM, THEN>() {
 			private static final long serialVersionUID = -1388017778891200080L;
-			private SerDes<TO, THEN> then = SerDes.sd(format);
 
 			@Override
 			public THEN ser(FROM o) {
@@ -34,6 +67,22 @@ public interface SerDes<FROM, TO> extends Serializable, Loggable {
 			@Override
 			public FROM deser(THEN r) {
 				return SerDes.this.deser(then.deser(r));
+			}
+		};
+	}
+
+	default <BEFORE> SerDes<BEFORE, TO> prior(SerDes<BEFORE, FROM> before) {
+		return new SerDes<BEFORE, TO>() {
+			private static final long serialVersionUID = -1388017778891200080L;
+
+			@Override
+			public TO ser(BEFORE o) {
+				return SerDes.this.ser(before.ser(o));
+			}
+
+			@Override
+			public BEFORE deser(TO r) {
+				return before.deser(SerDes.this.deser(r));
 			}
 		};
 	}
@@ -51,87 +100,9 @@ public interface SerDes<FROM, TO> extends Serializable, Loggable {
 			public TO deser(FROM r) {
 				return SerDes.this.ser(r);
 			}
-
-			@Override
-			public Class<TO> fromClass() {
-				return SerDes.this.toClass();
-			}
-
-			@Override
-			public Class<FROM> toClass() {
-				return SerDes.this.fromClass();
-			}
-
-			@Override
-			public String format() {
-				return "rev:" + SerDes.this.format();
-			}
 		};
 	}
 
 	// other
 	interface MapSerDes<TO> extends SerDes<Map<String, Object>, TO> {}
-
-	interface ListSerDes<FROM, TO> extends SerDes<List<FROM>, TO> {}
-
-	interface MapListSerDes<TO> extends ListSerDes<Map<String, Object>, TO> {}
-
-	// info
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	static <F, T, D extends SerDes<F, T>> D sd(String format) {
-		boolean revert = format.startsWith("rev:");
-		SerDes r = _Private.ALL_SDERS.computeIfAbsent(revert ? format.substring(4) : format, f -> {
-			Set<Class<? extends SerDes>> impls = Reflections.getSubClasses(SerDes.class);
-			for (Class<? extends SerDes> c : impls) {
-				SerAs sd = c.getAnnotation(SerAs.class);
-				if (null != sd && f.equals(sd.format())) try {
-					return c.getConstructor().newInstance();
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-						| NoSuchMethodException | SecurityException e) {
-							continue;
-						}
-			}
-			return null;
-		});
-		return (D) (null == r || !revert ? r : r.revert());
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	static <F, T, D extends SerDes<F, T>> D sd(String... format) {
-		if (null == format || format.length == 0) return null;
-		List<String> formats = Colls.list(format);
-		SerDes sd = sd(formats.remove(0));
-		for (String f : formats)
-			sd = sd.then(f);
-		return (D) sd;
-	}
-
-	@SuppressWarnings("unchecked")
-	default Class<FROM> fromClass() {
-		SerAs a = _Private.sdAnn(this.getClass());
-		return null == a ? null : (Class<FROM>) a.from();
-	}
-
-	@SuppressWarnings("unchecked")
-	default Class<TO> toClass() {
-		SerAs a = _Private.sdAnn(this.getClass());
-		return null == a ? null : (Class<TO>) a.to();
-	}
-
-	default String format() {
-		SerAs a = _Private.sdAnn(this.getClass());
-		return null == a ? null : a.format();
-	}
-
-	/**
-	 * on input, deser(), toClass is source class.<br>
-	 * on output, ser(), fromClass is source class.<br>
-	 * so the func return the <code>source class of serder is rmap</code>, means process whole record.<br>
-	 * if not, processing fields each by each.<br>
-	 */
-	default boolean isMapOp(boolean input) {
-		Class<?> c = input ? toClass() : fromClass();
-		return null == c ? false : Map.class.isAssignableFrom(c);
-	}
-
 }
