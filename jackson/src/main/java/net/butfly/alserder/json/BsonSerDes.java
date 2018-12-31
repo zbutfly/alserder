@@ -3,8 +3,8 @@ package net.butfly.alserder.json;
 import java.util.Map;
 
 import net.butfly.albacore.serder.BsonSerder;
+import net.butfly.alserder.SerAs;
 import net.butfly.alserder.SerDes.MapSerDes;
-import net.butfly.alserder.SerDes.SerAs;
 
 @SerAs(format = "bson", from = Map.class, to = byte[].class)
 public class BsonSerDes implements MapSerDes<byte[]> {

@@ -7,9 +7,8 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import net.butfly.albacore.serder.json.Jsons;
-import net.butfly.alserder.SerDes;
+import net.butfly.alserder.SerAs;
 import net.butfly.alserder.SerDes.MapListSerDes;
-import net.butfly.alserder.SerDes.SerAs;
 
 @SerAs(format = "jsons", from = List.class, to = String.class)
 public class JsonsSerDes implements MapListSerDes<String> {

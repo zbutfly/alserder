@@ -5,8 +5,8 @@ import java.util.Map;
 
 import net.butfly.albacore.serder.BsonSerder;
 import net.butfly.albacore.utils.collection.Colls;
+import net.butfly.alserder.SerAs;
 import net.butfly.alserder.SerDes.MapListSerDes;
-import net.butfly.alserder.SerDes.SerAs;
 
 @SerAs(format = "bsons", from = List.class, to = byte[].class)
 public class BsonsSerDes implements MapListSerDes<byte[]> {
