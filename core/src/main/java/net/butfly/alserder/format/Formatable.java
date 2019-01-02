@@ -24,7 +24,7 @@ public interface Formatable<M extends Map<String, Object>, T, F extends Format<M
 				+ Annotations.toString(defs[0]) + "] will be used. All serdes as: \n\t" + String.join("\n\t", Colls.list(
 						Annotations::toString, defs)));
 		F def = defs.length == 1 ? of(defs[0].value()) : null;
-		if (ConstFormat.class.isAssignableFrom(def.getClass())) def = null;
+		if (null != def && ConstFormat.class.isAssignableFrom(def.getClass())) def = null;
 		F fmt1 = null == fmts || fmts.isEmpty() ? null : fmts.get(0);
 		if (null == fmt1) {
 			if (null == def) return Colls.list();
