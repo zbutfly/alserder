@@ -1,5 +1,6 @@
 package net.butfly.alserder.format;
 
+import static net.butfly.albacore.utils.collection.Colls.empty;
 import static net.butfly.alserder.format.Format.as;
 import static net.butfly.alserder.format.Format.of;
 
@@ -25,7 +26,7 @@ public interface Formatable<M extends Map<String, Object>, T, F extends Format<M
 						Annotations::toString, defs)));
 		F def = defs.length == 1 ? of(defs[0].value()) : null;
 		if (null != def && ConstFormat.class.isAssignableFrom(def.getClass())) def = null;
-		F fmt1 = null == fmts || fmts.isEmpty() ? null : fmts.get(0);
+		F fmt1 = empty(fmts) ? null : fmts.get(0);
 		if (null == fmt1) {
 			if (null == def) return Colls.list();
 			logger().info("Non-format defined, default format [" + def.as().value() + "] used.");

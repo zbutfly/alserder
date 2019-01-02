@@ -10,12 +10,12 @@ public final class ConstFormat<M extends Map<String, Object>, D> extends Format<
 	private static final long serialVersionUID = 4665610987994353342L;
 
 	@Override
-	public M assemble(M m, @SuppressWarnings("unchecked") D... extra) {
+	public M ser(M m) {
 		return m;
 	}
 
 	@Override
-	public M disassemble(M m, @SuppressWarnings("unchecked") D... extra) {
+	public M deser(M m) {
 		return m;
 	}
 }

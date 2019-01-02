@@ -1,5 +1,7 @@
 package net.butfly.alserder.format;
 
+import static net.butfly.albacore.utils.collection.Colls.empty;
+
 import java.util.Map;
 
 import net.butfly.alserder.SerDes;
@@ -15,18 +17,20 @@ public class SerDesFormat<M extends Map<String, Object>, D> extends Format<M, D>
 	}
 
 	@Override
-	public M assemble(M m, D... extra) {
-		if (null == m || m.isEmpty()) return null;
+	public M ser(M m) {
+		if (empty(m)) return null;
+		Object v;
 		for (String k : m.keySet())
-			m.put(k, sd.ser(m.get(k)));
+			if (null != (v = sd.ser(m.get(k)))) m.put(k, v);
 		return m;
 	}
 
 	@Override
-	public M disassemble(M m, D... extra) {
-		if (null == m || m.isEmpty()) return null;
+	public M deser(M m) {
+		if (empty(m)) return null;
+		Object v;
 		for (String k : m.keySet())
-			m.put(k, sd.deser(m.get(k)));
+			if (null != (v = sd.deser(m.get(k)))) m.put(k, v);
 		return m;
 	}
 }

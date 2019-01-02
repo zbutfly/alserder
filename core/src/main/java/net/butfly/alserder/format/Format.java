@@ -1,6 +1,5 @@
 package net.butfly.alserder.format;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,40 +8,40 @@ import net.butfly.albacore.utils.Generics;
 import net.butfly.albacore.utils.Reflections;
 import net.butfly.albacore.utils.collection.Colls;
 import net.butfly.albacore.utils.collection.Maps;
-import net.butfly.albacore.utils.logger.Loggable;
 import net.butfly.albacore.utils.logger.Logger;
 import net.butfly.alserder.SerDes;
+import static net.butfly.albacore.utils.collection.Colls.empty;
 
 // it's Map SerDes
-public abstract class Format<M extends Map<String, Object>, D> implements Loggable, Serializable {
+public abstract class Format<M extends Map<String, Object>, D> implements FormatApi<M> {
 	private static final long serialVersionUID = -8223020677916696133L;
 	private SerDes.As as;
 
 	// loop invoking, need override at least one pair of methods.
-	public M assemble(M m, @SuppressWarnings("unchecked") D... extra) {
-		if (null == m || m.isEmpty()) return null;
-		M r = assembles(Colls.list(m), extra);
-		return null == r || r.isEmpty() ? null : r;
+	public M ser(M m, @SuppressWarnings("unchecked") D... extra) {
+		if (empty(m)) return null;
+		M r = sers(Colls.list(m), extra);
+		return empty(r) ? null : r;
 	}
 
-	public M disassemble(M m, @SuppressWarnings("unchecked") D... extra) {
-		if (null == m || m.isEmpty()) return null;
-		List<M> l = disassembles(m, extra);
-		return null == l || l.isEmpty() ? null : l.get(0);
+	public M deser(M m, @SuppressWarnings("unchecked") D... extra) {
+		if (empty(m)) return null;
+		List<M> l = desers(m, extra);
+		return empty(l) ? null : l.get(0);
 	}
 
-	public M assembles(List<M> l, @SuppressWarnings("unchecked") D... extra) {
-		if (null == l || l.isEmpty()) return null;
+	public M sers(List<M> l, @SuppressWarnings("unchecked") D... extra) {
+		if (empty(l)) return null;
 		if (l.size() > 1) //
 			logger().warn(getClass() + " does not support multiple serializing, only first will be writen: \n\t" + l.toString());
 		M first = l.get(0);
-		return null == first ? null : assemble(first, extra);
+		return null == first ? null : ser(first, extra);
 	}
 
-	public List<M> disassembles(M m, @SuppressWarnings("unchecked") D... extra) {
-		if (null == m || m.isEmpty()) return Colls.list();
-		M r = disassemble(m, extra);
-		return null == r || r.isEmpty() ? Colls.list() : Colls.list(r);
+	public List<M> desers(M m, @SuppressWarnings("unchecked") D... extra) {
+		if (empty(m)) return Colls.list();
+		M r = deser(m, extra);
+		return empty(r) ? Colls.list() : Colls.list(r);
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -83,6 +82,7 @@ public abstract class Format<M extends Map<String, Object>, D> implements Loggab
 		return this;
 	}
 
+	@Override
 	@SuppressWarnings("deprecation")
 	public Class<?> rawClass() {
 		return Generics.getGenericParamClass(this.getClass(), Format.class, "M");

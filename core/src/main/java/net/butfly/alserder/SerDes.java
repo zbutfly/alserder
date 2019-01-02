@@ -1,5 +1,7 @@
 package net.butfly.alserder;
 
+import static net.butfly.albacore.utils.collection.Colls.empty;
+
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
@@ -43,7 +45,7 @@ public interface SerDes<FROM, TO> extends Serializable, Loggable {
 	};
 
 	default TO sers(List<FROM> l) {
-		if (null == l || l.isEmpty()) return null;
+		if (empty(l)) return null;
 		if (l.size() > 1) //
 			logger().warn(getClass() + " does not support multiple serializing, only first will be writen: \n\t" + l.toString());
 		FROM first = l.get(0);
