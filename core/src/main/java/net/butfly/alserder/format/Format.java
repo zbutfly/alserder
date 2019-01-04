@@ -18,19 +18,19 @@ public abstract class Format<M extends Map<String, Object>, D> implements Format
 	private SerDes.As as;
 
 	// loop invoking, need override at least one pair of methods.
-	public M ser(M m, @SuppressWarnings("unchecked") D... extra) {
+	public M ser(M m, D extra) {
 		if (empty(m)) return null;
 		M r = sers(Colls.list(m), extra);
 		return empty(r) ? null : r;
 	}
 
-	public M deser(M m, @SuppressWarnings("unchecked") D... extra) {
+	public M deser(M m, D extra) {
 		if (empty(m)) return null;
 		List<M> l = desers(m, extra);
 		return empty(l) ? null : l.get(0);
 	}
 
-	public M sers(List<M> l, @SuppressWarnings("unchecked") D... extra) {
+	public M sers(List<M> l, D extra) {
 		if (empty(l)) return null;
 		if (l.size() > 1) //
 			logger().warn(getClass() + " does not support multiple serializing, only first will be writen: \n\t" + l.toString());
@@ -38,7 +38,7 @@ public abstract class Format<M extends Map<String, Object>, D> implements Format
 		return null == first ? null : ser(first, extra);
 	}
 
-	public List<M> desers(M m, @SuppressWarnings("unchecked") D... extra) {
+	public List<M> desers(M m, D extra) {
 		if (empty(m)) return Colls.list();
 		M r = deser(m, extra);
 		return empty(r) ? Colls.list() : Colls.list(r);
@@ -53,14 +53,16 @@ public abstract class Format<M extends Map<String, Object>, D> implements Format
 		return (F) FORMATS.computeIfAbsent(format, f -> {
 			Set<Class<? extends Format>> fcls = Reflections.getSubClasses(Format.class);
 			Format ff;
-			for (Class<? extends Format> c : fcls)
-				for (SerDes.As as : c.getAnnotationsByType(SerDes.As.class))
-					if (format.equals(as.value()) && null != (ff = Reflections.construct(c))) return ff.as(as);
+			for (Class<? extends Format> c : fcls) for (SerDes.As as : c.getAnnotationsByType(SerDes.As.class))
+				if (format.equals(as.value()) && null != (ff = Reflections.construct(c))) return ff.as(as);
 			logger.debug("Format [" + format + "] not found, scanning for SerDes.");
 			Set<Class<? extends SerDes>> sdcls = Reflections.getSubClasses(SerDes.class);
 			for (Class<? extends SerDes> c : sdcls)
-				for (SerDes.As as : c.getAnnotationsByType(SerDes.As.class))
-					if (format.equals(as.value())) return new SerDesFormat<>(Reflections.construct(c)).as(as);
+				for (SerDes.As as : c.getAnnotationsByType(SerDes.As.class)) if (format.equals(as.value())) {
+					SerDes sd = Reflections.construct(c);
+					Format fff = (Format) Reflections.construct("net.butfly.albatis.io.format.SerDesFormat", sd);
+					return fff.as(as);
+				}
 			logger.warn("SerDes [" + format + "] not found, values will not be changed.");
 			return constFormat();
 		});

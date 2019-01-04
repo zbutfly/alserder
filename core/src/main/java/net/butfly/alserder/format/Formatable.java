@@ -5,7 +5,6 @@ import static net.butfly.alserder.format.Format.as;
 import static net.butfly.alserder.format.Format.of;
 
 import java.util.List;
-import java.util.Map;
 
 import net.butfly.albacore.io.URISpec;
 import net.butfly.albacore.utils.Annotations;
@@ -13,20 +12,21 @@ import net.butfly.albacore.utils.collection.Colls;
 import net.butfly.albacore.utils.logger.Loggable;
 import net.butfly.alserder.SerDes;
 
-public interface Formatable<M extends Map<String, Object>, T, F extends Format<M, T>> extends Loggable {
+public interface Formatable extends Loggable {
 	URISpec uri();
 
-	default List<F> formats() {
-		String format = uri().fetchParameter("df");
-		List<F> fmts = null == format ? Colls.list() : Colls.list(f -> of(f), format.split(","));
+	@SuppressWarnings("rawtypes")
+	default List<Format> formats() {
+		String format = uri().getParameter("df");
+		List<Format> fmts = null == format ? Colls.list() : Colls.list(f -> of(f), format.split(","));
 
 		SerDes.As[] defs = as(getClass());
 		if (defs.length > 1) logger().warn("Multiple default serdes as annotations marked on " + getClass().getName() + ", first ["
 				+ Annotations.toString(defs[0]) + "] will be used. All serdes as: \n\t" + String.join("\n\t", Colls.list(
 						Annotations::toString, defs)));
-		F def = defs.length == 1 ? of(defs[0].value()) : null;
+		Format def = defs.length == 1 ? of(defs[0].value()) : null;
 		if (null != def && ConstFormat.class.isAssignableFrom(def.getClass())) def = null;
-		F fmt1 = empty(fmts) ? null : fmts.get(0);
+		Format fmt1 = empty(fmts) ? null : fmts.get(0);
 		if (null == fmt1) {
 			if (null == def) return Colls.list();
 			logger().info("Non-format defined, default format [" + def.as().value() + "] used.");
