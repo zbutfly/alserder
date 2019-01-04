@@ -1,12 +1,12 @@
-package net.butfly.alserder.json;
+package net.butfly.alserdes.json;
 
 import java.util.List;
 import java.util.Map;
 
 import net.butfly.albacore.serder.BsonSerder;
 import net.butfly.albacore.utils.collection.Colls;
-import net.butfly.alserder.SerDes;
-import net.butfly.alserder.SerDes.MapSerDes;
+import net.butfly.alserdes.SerDes;
+import net.butfly.alserdes.SerDes.MapSerDes;
 
 @SerDes.As("bson")
 @SerDes.As(value = "bsons", list = true)

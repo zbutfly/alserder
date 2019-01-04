@@ -1,4 +1,4 @@
-package net.butfly.alserder.format;
+package net.butfly.alserdes.format;
 
 import static net.butfly.albacore.utils.collection.Colls.empty;
 
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.butfly.albacore.utils.collection.Colls;
-import net.butfly.alserder.SerDes;
+import net.butfly.alserdes.SerDes;
 
 public interface FormatApi<M extends Map<String, Object>> extends SerDes<M, M> {
 	/**

@@ -1,4 +1,4 @@
-package net.butfly.alserder;
+package net.butfly.alserdes;
 
 @SerDes.As("str")
 public class StringSerDes implements SerDes<String, byte[]> {

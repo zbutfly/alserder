@@ -1,4 +1,4 @@
-package net.butfly.alserder;
+package net.butfly.alserdes;
 
 import static net.butfly.albacore.utils.collection.Colls.empty;
 

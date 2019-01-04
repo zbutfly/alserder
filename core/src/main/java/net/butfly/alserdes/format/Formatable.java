@@ -1,8 +1,8 @@
-package net.butfly.alserder.format;
+package net.butfly.alserdes.format;
 
 import static net.butfly.albacore.utils.collection.Colls.empty;
-import static net.butfly.alserder.format.Format.as;
-import static net.butfly.alserder.format.Format.of;
+import static net.butfly.alserdes.format.Format.as;
+import static net.butfly.alserdes.format.Format.of;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import net.butfly.albacore.io.URISpec;
 import net.butfly.albacore.utils.Annotations;
 import net.butfly.albacore.utils.collection.Colls;
 import net.butfly.albacore.utils.logger.Loggable;
-import net.butfly.alserder.SerDes;
+import net.butfly.alserdes.SerDes;
 
 public interface Formatable extends Loggable {
 	URISpec uri();

@@ -2,11 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.butfly.albacore</groupId>
-		<artifactId>albacore</artifactId>
+		<groupId>net.butfly</groupId>
+		<artifactId>parent</artifactId>
 		<version>3.1.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>albacore-serder</artifactId>
+	<groupId>net.butfly.alserdes</groupId>
+	<artifactId>alserdes</artifactId>
 	<version>1.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
@@ -16,6 +17,7 @@
 		<module>core</module>
 		<module>hessian</module>
 		<module>jackson</module>
+		<module>avro</module>
 		<!-- <module>kryo</module> -->
 		<!-- <module>protobuf</module> -->
 	</modules>

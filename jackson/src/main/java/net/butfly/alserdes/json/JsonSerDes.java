@@ -1,4 +1,4 @@
-package net.butfly.alserder.json;
+package net.butfly.alserdes.json;
 
 import java.io.IOException;
 import java.util.List;
@@ -8,8 +8,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import net.butfly.albacore.serder.JsonSerder;
 import net.butfly.albacore.serder.json.Jsons;
-import net.butfly.alserder.SerDes;
-import net.butfly.alserder.SerDes.MapSerDes;
+import net.butfly.alserdes.SerDes;
+import net.butfly.alserdes.SerDes.MapSerDes;
 
 @SerDes.As("json")
 @SerDes.As(value = "jsons", list = true)

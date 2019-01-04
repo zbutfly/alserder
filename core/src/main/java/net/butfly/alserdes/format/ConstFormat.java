@@ -1,8 +1,8 @@
-package net.butfly.alserder.format;
+package net.butfly.alserdes.format;
 
 import java.util.Map;
 
-import net.butfly.alserder.SerDes;
+import net.butfly.alserdes.SerDes;
 
 @SerDes.As("")
 @SerDes.As("const")
