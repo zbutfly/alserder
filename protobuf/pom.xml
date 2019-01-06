@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>net.butfly.albacore</groupId>
 		<artifactId>albacore-serder</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1</version>
 	</parent>
 	<artifactId>albacore-serder-protobuf</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>net.butfly.albacore</groupId>
 			<artifactId>albacore-serder-core</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.protobuf</groupId>

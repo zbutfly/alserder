@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>net.butfly.albacore</groupId>
 		<artifactId>albacore-serder</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1</version>
 	</parent>
 	<artifactId>albacore-serder-core</artifactId>
 	<dependencies>
