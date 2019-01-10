@@ -45,4 +45,9 @@ public class BsonSerDes implements MapSerDes<byte[]> {
 		}
 		throw new IllegalArgumentException("Bson not a list, but a " + vvv.getClass());
 	}
+
+	@Override
+	public Class<?> formatClass() {
+		return byte[].class;
+	}
 }

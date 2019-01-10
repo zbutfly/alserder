@@ -87,7 +87,7 @@ public abstract class Format<M extends Map<String, Object>, D> implements Format
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public Class<?> rawClass() {
+	public Class<?> formatClass() {
 		return Generics.getGenericParamClass(this.getClass(), Format.class, "M");
 	}
 

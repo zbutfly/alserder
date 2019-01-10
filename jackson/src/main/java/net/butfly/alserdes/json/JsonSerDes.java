@@ -43,4 +43,9 @@ public class JsonSerDes implements MapSerDes<String> {
 			throw new IllegalArgumentException(e);
 		}
 	}
+
+	@Override
+	public Class<?> formatClass() {
+		return String.class;
+	}
 }

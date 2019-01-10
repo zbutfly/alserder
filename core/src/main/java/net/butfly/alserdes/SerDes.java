@@ -32,8 +32,13 @@ public interface SerDes<FROM, TO> extends Serializable, Loggable {
 	}
 
 	@SuppressWarnings("deprecation")
-	default Class<?> rawClass() {
+	default Class<?> formatClass() {
 		return Generics.getGenericParamClass(getClass(), SerDes.class, "TO");
+	}
+
+	@SuppressWarnings("deprecation")
+	default Class<?> recClass() {
+		return Generics.getGenericParamClass(getClass(), SerDes.class, "FROM");
 	}
 
 	default TO ser(FROM v) {
@@ -106,5 +111,15 @@ public interface SerDes<FROM, TO> extends Serializable, Loggable {
 	}
 
 	// other
-	interface MapSerDes<TO> extends SerDes<Map<String, Object>, TO> {}
+	interface MapSerDes<TO> extends SerDes<Map<String, Object>, TO> {
+		@Override
+		default Class<?> recClass() {
+			return Map.class;
+		}
+
+		@Override
+		default Map<String, Object> deser(TO r) {
+			return SerDes.super.deser(r);
+		}
+	}
 }
