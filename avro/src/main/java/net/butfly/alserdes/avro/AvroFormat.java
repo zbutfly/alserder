@@ -2,6 +2,7 @@ package net.butfly.alserdes.avro;
 
 import com.twitter.bijection.Injection;
 import com.twitter.bijection.avro.GenericAvroCodecs;
+import net.butfly.albacore.utils.collection.Colls;
 import net.butfly.albatis.ddl.FieldDesc;
 import net.butfly.albatis.ddl.TableDesc;
 import net.butfly.albatis.io.Rmap;
@@ -10,15 +11,28 @@ import net.butfly.alserdes.SerDes;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.*;
+import org.apache.avro.reflect.ReflectDatumReader;
+import org.apache.avro.reflect.ReflectDatumWriter;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.butfly.albacore.utils.collection.Colls.empty;
 import static net.butfly.albatis.ddl.vals.ValType.Flags.*;
 
 @SerDes.As("avro")
 public class AvroFormat extends RmapFormat {
 	private static final long serialVersionUID = 3687957634350865452L;
+	private static final Schema MAP_SCHEMA = Schema.createMap(Schema.createUnion(Colls.list(Schema::create, //
+			Schema.Type.STRING, Schema.Type.BYTES, Schema.Type.BOOLEAN, //
+			Schema.Type.INT, Schema.Type.LONG, Schema.Type.FLOAT, Schema.Type.DOUBLE)));
+	private static final Schema LIST_SCHEMA = Schema.createArray(MAP_SCHEMA);
+	private static final EncoderFactory encFactory = EncoderFactory.get();
+	private static final DecoderFactory decFactory = DecoderFactory.get();
 
 	@Override
 	public Rmap ser(Rmap src, TableDesc dst) {
@@ -80,12 +94,32 @@ public class AvroFormat extends RmapFormat {
 
 	@Override
 	public Rmap ser(Rmap src) {
-		throw new UnsupportedOperationException("Schemaness record list format not implemented now.");
+		if (empty(src)) return null;
+		Rmap rmap = new Rmap();
+		try (final ByteArrayOutputStream o = new ByteArrayOutputStream()) {
+			JsonEncoder enc = encFactory.jsonEncoder(LIST_SCHEMA, o);
+			final DatumWriter<Object> writer = new ReflectDatumWriter<>();
+			writer.write(src, enc);
+			rmap.put(src.table(),o.toByteArray());
+			return rmap;
+		} catch (IOException e) {
+			return null;
+		}
 	}
 
 	@Override
 	public Rmap deser(Rmap dst) {
-		throw new UnsupportedOperationException("Schemaness record list format not implemented now.");
+		if (empty(dst)) return null;
+		for(Object v :dst.map().values()){
+			try (final ByteArrayInputStream i = new ByteArrayInputStream((byte[])v)) {
+				JsonDecoder dec = decFactory.jsonDecoder(MAP_SCHEMA, i);
+				final DatumReader<Object> reader = new ReflectDatumReader<>();
+				return (Rmap) reader.read(null, dec);
+			} catch (IOException e) {
+				return null;
+			}
+		}
+		return null;
 	}
 
 	@Override
