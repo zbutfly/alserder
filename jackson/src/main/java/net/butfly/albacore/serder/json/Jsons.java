@@ -116,4 +116,12 @@ public final class Jsons extends Utils {
 	public static String simpleJSON(Map<String, ?> map) {
 		return JsonSerder.JSON_MAPPER.ser((Map<String, Object>) map).toString();
 	}
+
+	public static final String pretty(Object t) {
+		try {
+			return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(t);
+		} catch (JsonProcessingException e) {
+			return "json error: " + e.getMessage();
+		}
+	}
 }
