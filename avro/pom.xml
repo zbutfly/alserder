@@ -21,15 +21,11 @@
 			<artifactId>avro</artifactId>
 			<version>1.8.2</version>
 		</dependency>
-		<dependency>
-			<groupId>com.twitter</groupId>
-			<artifactId>bijection-avro_2.11</artifactId>
-			<version>0.9.6</version>
-		</dependency>
-		<dependency>
-			<groupId>net.butfly.albatis</groupId>
-			<artifactId>albatis-core</artifactId>
-			<version>1.5.3-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>confluent</id>
+			<url>http://packages.confluent.io/maven/</url>
+		</repository>
+	</repositories>
 </project>
