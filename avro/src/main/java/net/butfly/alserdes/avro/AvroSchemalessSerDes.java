@@ -28,11 +28,11 @@ public class AvroSchemalessSerDes implements MapSerDes<byte[]> {
 	private static final Schema MAP_SCHEMA = Schema.createMap(Schema.createUnion(Colls.list(t -> Schema.create(t), //
 			Schema.Type.STRING, Schema.Type.BYTES, Schema.Type.BOOLEAN, //
 			Schema.Type.INT, Schema.Type.LONG, Schema.Type.FLOAT, Schema.Type.DOUBLE)));
+	// not include: RECORD, ENUM, ARRAY, MAP, UNION, FIXED, NULL,
 	private static final Schema LIST_SCHEMA = Schema.createArray(MAP_SCHEMA);
 	private static final EncoderFactory encFactory = EncoderFactory.get();
 	private static final DecoderFactory decFactory = DecoderFactory.get();
 
-	// RECORD, ENUM, ARRAY, MAP, UNION, FIXED, NULL,
 	@Override
 	public byte[] ser(Map<String, Object> m) {
 		if (empty(m)) return null;
