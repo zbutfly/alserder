@@ -93,11 +93,10 @@ public class AvroSerDes extends AvroSchemalessSerDes {
 		static final Map<String, DatumReader<GenericRecord>> READERS = Maps.of();
 
 		static byte[] ser(Map<String, Object> m, Schema schema) {
-			GenericData.Record rec = new GenericData.Record(schema);
-			m.forEach(rec::put);
+			GenericRecord rec = rec(m, schema);
+			DataFileWriter<GenericRecord> writer = WRITERS.computeIfAbsent(schema.getFullName(), //
+					q -> new DataFileWriter<>(new GenericDatumWriter<GenericRecord>(schema)));
 			byte[] avro;
-			DataFileWriter<GenericRecord> writer = WRITERS.computeIfAbsent(schema.getFullName(), q -> new DataFileWriter<>(
-					new GenericDatumWriter<GenericRecord>(schema)));
 			try (ByteArrayOutputStream out = new ByteArrayOutputStream();) {
 				writer.create(schema, out);
 				writer.append(rec);
@@ -123,6 +122,12 @@ public class AvroSerDes extends AvroSchemalessSerDes {
 			} catch (IOException e) {
 				return null;
 			}
+		}
+
+		static GenericRecord rec(Map<String, Object> m, Schema schema) {
+			GenericRecord rec = new GenericData.Record(schema);
+			schema.getFields().forEach(f -> rec.put(f.name(), m.get(f.name())));
+			return rec;
 		}
 	}
 }
