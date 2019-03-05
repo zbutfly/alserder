@@ -6,10 +6,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.time.ZoneOffset;
+import java.util.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileReader;
@@ -56,14 +54,25 @@ public class AvroSerDes extends AvroSchemalessSerDes {
 
 		static Schema.Field field(String name, Object type) {
 			if (null == name && null == type) return null;
-			if (type instanceof byte[]) return new Schema.Field(name, Schema.create(Schema.Type.BYTES), null, new byte[0]);
-			else if (type instanceof Integer) return new Schema.Field(name, Schema.create(Schema.Type.INT), null, 0);
-			else if (type instanceof Long || type instanceof Date) return new Schema.Field(name, Schema.create(Schema.Type.LONG), null, 0);
-			else if (type instanceof Float) return new Schema.Field(name, Schema.create(Schema.Type.FLOAT), null, 0.0);
-			else if (type instanceof Double) return new Schema.Field(name, Schema.create(Schema.Type.DOUBLE), null, 0.0);
-			else if (type instanceof Boolean) return new Schema.Field(name, Schema.create(Schema.Type.BOOLEAN), null, false);
-			else if (type instanceof String) return new Schema.Field(name, Schema.create(Schema.Type.STRING), null, "");
+			if (type instanceof byte[])
+				return new Schema.Field(name, createOptional(Schema.create(Schema.Type.BYTES)), null, new byte[0]);
+			else if (type instanceof Integer)
+				return new Schema.Field(name, createOptional(Schema.create(Schema.Type.INT)), null, 0);
+			else if (type instanceof Long || type instanceof Date)
+				return new Schema.Field(name, createOptional(Schema.create(Schema.Type.LONG)), null, 0);
+			else if (type instanceof Float)
+				return new Schema.Field(name, createOptional(Schema.create(Schema.Type.FLOAT)), null, 0.0);
+			else if (type instanceof Double)
+				return new Schema.Field(name, createOptional(Schema.create(Schema.Type.DOUBLE)), null, 0.0);
+			else if (type instanceof Boolean)
+				return new Schema.Field(name, createOptional(Schema.create(Schema.Type.BOOLEAN)), null, false);
+			else if (type instanceof String)
+				return new Schema.Field(name, createOptional(Schema.create(Schema.Type.STRING)), null, "");
 			else throw new UnsupportedOperationException("This schema type  is unsupported");
+		}
+
+		static Schema createOptional(Schema schema) {
+			return Schema.createUnion(Arrays.asList(schema, Schema.create(Schema.Type.NULL)));
 		}
 
 		/**
@@ -112,7 +121,7 @@ public class AvroSerDes extends AvroSchemalessSerDes {
 			DatumReader<GenericRecord> reader = READERS.computeIfAbsent(schema.getFullName(), q -> new GenericDatumReader<GenericRecord>(
 					schema));
 			try (SeekableInput in = new SeekableByteArrayInput((byte[]) v);
-					FileReader<GenericRecord> fr = DataFileReader.openReader(in, reader);) {
+				 FileReader<GenericRecord> fr = DataFileReader.openReader(in, reader);) {
 				if (!fr.hasNext()) return null;
 				GenericRecord rec = fr.next();
 				if (null == rec || null == rec.getSchema() || empty(rec.getSchema().getFields())) return null;
@@ -126,7 +135,14 @@ public class AvroSerDes extends AvroSchemalessSerDes {
 
 		static GenericRecord rec(Map<String, Object> m, Schema schema) {
 			GenericRecord rec = new GenericData.Record(schema);
-			schema.getFields().forEach(f -> rec.put(f.name(), m.get(f.name())));
+			schema.getFields().forEach(f -> {
+				Object value = m.get(f.name());
+				if (value instanceof Date) {
+					long epochSecond = ((Date) value).toInstant().atOffset(ZoneOffset.UTC).toEpochSecond();
+					rec.put(f.name(), epochSecond);
+				} else
+					rec.put(f.name(), value);
+			});
 			return rec;
 		}
 	}
