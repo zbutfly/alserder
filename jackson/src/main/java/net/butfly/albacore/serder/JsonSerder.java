@@ -22,6 +22,7 @@ public class JsonSerder<E> extends ContentSerderBase implements TextSerder<E>, B
 	private static final long serialVersionUID = -4394900785541475884L;
 	static final Logger logger = Logger.getLogger(JsonSerder.class);
 	public static final JsonMapSerder JSON_MAPPER = new JsonMapSerder();
+	public static final JsonListSerder JSONARRAY_MAPPER=new JsonListSerder();
 
 	public static <T> JsonSerder<T> SERDER(Class<T> cl) {
 		return new JsonSerder<T>();
@@ -131,6 +132,71 @@ public class JsonSerder<E> extends ContentSerderBase implements TextSerder<E>, B
 		@Override
 		public <T extends Map<String, Object>> T der(CharSequence from, Class<T> to) {
 			return ((ClassInfoSerder<Map<String, Object>, CharSequence>) this).der(from);
+		}
+	}
+	
+	public static final class JsonListSerder extends JsonSerder<List<Object>> implements
+	ClassInfoSerder<List<Object>, CharSequence>{
+
+		private static final long serialVersionUID = 8307154468153542869L;
+		private static final JavaType t = TypeFactory.defaultInstance().constructMapType(HashMap.class, String.class, Object.class);
+		private static final JavaType ts = TypeFactory.defaultInstance().constructParametricType(List.class, TypeFactory.defaultInstance()
+				.constructMapType(HashMap.class, String.class, Object.class));
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public final List<Object>[] der(CharSequence from, Class<?>... tos) {
+			return (List<Object>[]) super.der(from, tos);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		protected <T> T single(JsonNode node, Class<T> c) {
+			return (T) super.single(node, Map.class);
+		}
+
+		@Override
+		public <T extends List<Object>> T der(CharSequence from) {
+			if (null == from) return null;
+			try {
+				return Jsons.mapper.readValue(from.toString(), t);
+			} catch (IOException e) {
+				return null;
+			}
+		}
+
+		@SuppressWarnings("unchecked")
+		public <T extends List<Object>> List<T> ders(CharSequence from) {
+			Object r;
+			if (null == from) return null;
+			try {
+				r = Jsons.mapper.readValue(from.toString(), t);
+			} catch (IOException e) {
+				try {
+					r = Jsons.mapper.readValue(from.toString(), ts);
+				} catch (IOException e1) {
+					return null;
+				}
+			}
+			if (r instanceof List) {
+				List<List<Object>> list = new ArrayList<>();
+				list.add((T) r);
+				return (List<T>) list;
+			} else if (r instanceof List) { return (List<T>) r; }
+			throw new RuntimeException("Not support this type:" + r.getClass().getName());
+		}
+
+		public String sers(List<Object>[] v) {
+			try {
+				return Jsons.mapper.writeValueAsString(v);
+			} catch (JsonProcessingException e) {
+				return null;
+			}
+		}
+
+		@Override
+		public <T extends List<Object>> T der(CharSequence from, Class<T> to) {
+			return ((ClassInfoSerder<List<Object>, CharSequence>) this).der(from);
 		}
 	}
 }
